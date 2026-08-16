@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>เกมอ่านภาพอุปกรณ์คอมพิวเตอร์</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Sarabun", sans-serif;
+    background: linear-gradient(135deg, #f7f9ff, #eef7ff);
+    color: #1f2937;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 18px;
+  }
+  .app {
+    width: min(980px, 100%);
+  }
+  h1 {
+    text-align: center;
+    margin: 8px 0 4px;
+    font-size: clamp(26px, 4vw, 42px);
+  }
+  .sub {
+    text-align: center;
+    margin-bottom: 18px;
+    color: #52606d;
+  }
+  .panel {
+    background: white;
+    border-radius: 22px;
+    padding: 18px;
+    box-shadow: 0 10px 35px rgba(0,0,0,.08);
+  }
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 18px;
+  }
+  label {
+    font-weight: 700;
+  }
+  select, button {
+    font: inherit;
+    border-radius: 14px;
+    border: 1px solid #cbd5e1;
+    padding: 10px 14px;
+    background: white;
+  }
+  button {
+    cursor: pointer;
+    font-weight: 800;
+  }
+  .primary {
+    background: #2563eb;
+    color: white;
+    border-color: #2563eb;
+  }
+  .danger {
+    background: #ef4444;
+    color: white;
+    border-color: #ef4444;
+  }
+  .scorebar {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-weight: 800;
+    margin: 8px 0 14px;
+    flex-wrap: wrap;
+  }
+  .timer {
+    font-size: 1.2rem;
+  }
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    min-height: 260px;
+    align-content: center;
+  }
+  .card {
+    aspect-ratio: 1 / 1;
+    border-radius: 20px;
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(48px, 9vw, 92px);
+    user-select: none;
+    transition: transform .15s ease;
+  }
+  .card:hover { transform: scale(1.03); }
+  .answer {
+    margin-top: 16px;
+    padding: 14px;
+    background: #f1f5f9;
+    border-radius: 14px;
+    text-align: center;
+    font-size: clamp(18px, 3vw, 26px);
+    font-weight: 800;
+    display: none;
+  }
+  .buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 18px;
+  }
+  .tip {
+    text-align: center;
+    margin-top: 16px;
+    color: #64748b;
+    font-size: .95rem;
+  }
+  @media (max-width: 650px) {
+    .cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .panel { padding: 14px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <h1>🖥️ เกมอ่านภาพอุปกรณ์คอม</h1>
+  <div class="sub">เห็นภาพแล้วอ่านชื่อให้ถูกและเร็วที่สุด</div>
+
+  <div class="panel">
+    <div class="controls">
+      <label for="level">ระดับ:</label>
+      <select id="level">
+        <option value="6">ง่าย — 6 รูป</option>
+        <option value="8" selected>กลาง — 8 รูป</option>
+        <option value="12">ยาก — 12 รูป</option>
+      </select>
+
+      <label for="seconds">เวลา:</label>
+      <select id="seconds">
+        <option value="15">15 วินาที</option>
+        <option value="20" selected>20 วินาที</option>
+        <option value="30">30 วินาที</option>
+        <option value="0">ไม่จับเวลา</option>
+      </select>
+
+      <button class="primary" onclick="newRound()">🎲 เริ่ม / สุ่มใหม่</button>
+    </div>
+
+    <div class="scorebar">
+      <div>ข้อที่ <span id="round">0</span></div>
+      <div class="timer">⏱️ <span id="time">--</span></div>
+      <div>คะแนน <span id="score">0</span></div>
+    </div>
+
+    <div class="cards" id="cards">
+      <div style="grid-column:1/-1;text-align:center;color:#64748b;font-size:22px;">
+        กด “เริ่ม / สุ่มใหม่” เพื่อเริ่มเล่น
+      </div>
+    </div>
+
+    <div class="answer" id="answer"></div>
+
+    <div class="buttons">
+      <button onclick="showAnswer()">👀 ดูเฉลย</button>
+      <button onclick="markCorrect()">✅ อ่านถูก +1</button>
+      <button onclick="newRound()">➡️ ข้อต่อไป</button>
+      <button class="danger" onclick="resetGame()">↺ เริ่มคะแนนใหม่</button>
+    </div>
+
+    <div class="tip">
+      วิธีเล่น: อ่านชื่อภาพจากซ้ายไปขวา เช่น “เมาส์ จอ จอ ไมค์ เมาส์ …”<br>
+      เหมาะเล่นเดี่ยว แข่งเป็นทีม หรือให้อาจารย์จับเวลา
+    </div>
+  </div>
+</div>
+
+<script>
+const items = [
+  {name:"เมาส์", emoji:"🖱️"},
+  {name:"จอ", emoji:"🖥️"},
+  {name:"คีย์บอร์ด", emoji:"⌨️"},
+  {name:"ไมค์", emoji:"🎤"},
+  {name:"หูฟัง", emoji:"🎧"},
+  {name:"ปริ้นเตอร์", emoji:"🖨️"},
+  {name:"แผ่น", emoji:"💿"},
+  {name:"ปลั๊ก", emoji:"🔌"}
+];
+
+let sequence = [];
+let round = 0;
+let score = 0;
+let timer = null;
+let remaining = 0;
+
+function newRound() {
+  clearInterval(timer);
+  document.getElementById("answer").style.display = "none";
+  const count = Number(document.getElementById("level").value);
+  sequence = [];
+
+  // ใช้ชุดคำหลักไม่มากเกินไปในแต่ละข้อ เพื่อให้เกิดการอ่านซ้ำแบบเกมต้นฉบับ
+  const pool = [...items].sort(() => Math.random() - .5).slice(0, 5);
+
+  for (let i = 0; i < count; i++) {
+    const obj = pool[Math.floor(Math.random() * pool.length)];
+    sequence.push(obj);
+  }
+
+  const cards = document.getElementById("cards");
+  cards.innerHTML = "";
+  sequence.forEach(obj => {
+    const d = document.createElement("div");
+    d.className = "card";
+    d.textContent = obj.emoji;
+    d.title = obj.name;
+    cards.appendChild(d);
+  });
+
+  round++;
+  document.getElementById("round").textContent = round;
+
+  const sec = Number(document.getElementById("seconds").value);
+  if (sec > 0) {
+    remaining = sec;
+    document.getElementById("time").textContent = remaining + " วินาที";
+    timer = setInterval(() => {
+      remaining--;
+      document.getElementById("time").textContent = remaining + " วินาที";
+      if (remaining <= 0) {
+        clearInterval(timer);
+        document.getElementById("time").textContent = "หมดเวลา!";
+      }
+    }, 1000);
+  } else {
+    document.getElementById("time").textContent = "ไม่จำกัด";
+  }
+}
+
+function showAnswer() {
+  if (!sequence.length) return;
+  const ans = document.getElementById("answer");
+  ans.textContent = sequence.map(x => x.name).join(" • ");
+  ans.style.display = "block";
+}
+
+function markCorrect() {
+  if (!sequence.length) return;
+  score++;
+  document.getElementById("score").textContent = score;
+  newRound();
+}
+
+function resetGame() {
+  clearInterval(timer);
+  round = 0;
+  score = 0;
+  sequence = [];
+  document.getElementById("round").textContent = "0";
+  document.getElementById("score").textContent = "0";
+  document.getElementById("time").textContent = "--";
+  document.getElementById("answer").style.display = "none";
+  document.getElementById("cards").innerHTML =
+    '<div style="grid-column:1/-1;text-align:center;color:#64748b;font-size:22px;">กด “เริ่ม / สุ่มใหม่” เพื่อเริ่มเล่น</div>';
+}
+</script>
+</body>
+</html>
