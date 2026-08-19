@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magic of 24 numbers</title>
+    <style>
+        body {
+            background-color: #FFF5ED;
+            padding: 0;
+            margin: 0;
+            text-align: center;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 9vh;
+        }
+
+        .container {
+            width: calc(100vw - 30px);
+            height: calc(100vh - 30px);
+            display: grid;
+            grid-template-areas: 'a b'
+                'c d';
+            column-gap: 15px;
+            row-gap: 15px;
+
+            padding: 15px;
+            margin: 0;
+        }
+
+        .a {
+            grid-area: 'a';
+            border: 1px solid black;
+            padding: 15px;
+            background-color: #FAE0D8;
+        }
+
+        .b {
+            grid-area: 'b';
+            border: 1px solid black;
+            padding: 15px;
+            background-color: #F0F4BF;
+        }
+
+        .c {
+            grid-area: 'c';
+            border: 1px solid black;
+            padding: 15px;
+            background-color: #DFE1BE;
+        }
+
+        .d {
+            grid-area: 'd';
+            border: 1px solid black;
+            padding: 15px;
+            background-color: #F1DEEE;
+        }
+
+        .red-circle-button {
+            position: absolute;
+            /* Set equal width and height for a perfect circle */
+            width: 20vh;
+            height: 20vh;
+            top: calc(50% - 10vh);
+            left: calc(50% - 10vh);
+            background-color: red;
+            font-size: 30px;
+
+            /* Set the background color to red */
+            border-radius: 50%;
+            /* Makes the element circular */
+            border: none;
+            /* Removes default button border */
+            color: white;
+            /* Text color for visibility */
+            font-size: 16px;
+            /* Adjust font size as needed */
+            display: flex;
+            /* For centering content (optional) */
+            justify-content: center;
+            /* For centering content (optional) */
+            align-items: center;
+            /* For centering content (optional) */
+            cursor: pointer;
+            /* Indicates it's clickable */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div id="n1" class="a"></div>
+        <div id="n2" class="b"></div>
+        <div id="n3" class="c"></div>
+        <div id="n4" class="d"></div>
+    </div>
+    <div>
+        <button class="red-circle-button" onclick="random()"> random </button>
+    </div>
+</body>
+<script>
+    function random() {
+        let doc = [];
+        doc[0] = document.querySelector("#n1");
+        doc[1] = document.querySelector("#n2");
+        doc[2] = document.querySelector("#n3");
+        doc[3] = document.querySelector("#n4");
+        for (let i = 0; i < 4; i++) {
+            let n = Math.floor(Math.random() * 10);
+            doc[i].innerHTML = `<h1>${n}</h1>`;
+        }
+    }
+    window.onload = () => {
+        //random();
+    }
+</script>
+
+</html>
